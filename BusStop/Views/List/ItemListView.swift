@@ -39,7 +39,6 @@ struct ItemListView: View {
                     }
                 }
                 .onDelete { offsets in
-                    // Only allow deleting custom items
                     let builtInCount = items.count - customStore.items.count
                     let customOffsets = IndexSet(offsets.compactMap { index in
                         let adjustedIndex = index - builtInCount
@@ -51,9 +50,7 @@ struct ItemListView: View {
                 }
             }
             .id("\(settings.breakDownItems)-\(settings.includeStabilized)-\(customStore.items.count)")
-            .listStyle(.plain)
             .navigationTitle("Memory Items")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

@@ -34,9 +34,22 @@
 		2AD4D1552F6E493F00304964 /* BusStopUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BusStopUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2A3ABDAC2F6F2ABE00129F2E /* Exceptions for "BusStop" folder in "BusStop" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2AD4D13D2F6E493E00304964 /* BusStop */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2AD4D1402F6E493E00304964 /* BusStop */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2A3ABDAC2F6F2ABE00129F2E /* Exceptions for "BusStop" folder in "BusStop" target */,
+			);
 			path = BusStop;
 			sourceTree = "<group>";
 		};
@@ -408,6 +421,8 @@
 				DEVELOPMENT_TEAM = 64JJZBP4P3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BusStop/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -445,6 +460,8 @@
 				DEVELOPMENT_TEAM = 64JJZBP4P3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BusStop/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
