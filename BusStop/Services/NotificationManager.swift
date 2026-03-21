@@ -14,7 +14,7 @@ final class NotificationManager: NSObject {
     private let settings = SettingsManager.shared
 
     private var items: [MemoryItem] {
-        MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized)
+        MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: CustomItemsStore.shared.items)
     }
 
     private override init() {
@@ -32,25 +32,35 @@ final class NotificationManager: NSObject {
         }
     }
 
-    // MARK: - Schedule Daily Notifications
+    // MARK: - Schedule Notifications
 
     func reschedule() {
         center.removeAllPendingNotificationRequests()
 
         guard settings.notificationsEnabled else { return }
 
-        let count = settings.notificationsPerDay
         let startHour = settings.activeStartHour
         let endHour = settings.activeEndHour
 
-        guard count > 0, endHour > startHour, !items.isEmpty else { return }
+        guard endHour > startHour, !items.isEmpty else { return }
 
         let calendar = Calendar.current
+        let daysToSchedule: Int
 
-        for dayOffset in 0...1 {
+        switch settings.notificationInterval {
+        case .hour, .day:
+            daysToSchedule = 2
+        case .week:
+            daysToSchedule = 7
+        }
+
+        for dayOffset in 0..<daysToSchedule {
             guard let baseDate = calendar.date(byAdding: .day, value: dayOffset, to: Date()) else { continue }
 
-            let times = generateRandomTimes(count: count, startHour: startHour, endHour: endHour,
+            let countForDay = notificationsForDay(dayOffset: dayOffset)
+            guard countForDay > 0 else { continue }
+
+            let times = generateRandomTimes(count: countForDay, startHour: startHour, endHour: endHour,
                                             baseDate: baseDate, calendar: calendar)
 
             for (index, fireDate) in times.enumerated() {
@@ -62,7 +72,22 @@ final class NotificationManager: NSObject {
             }
         }
 
-        print("[BusStop] Scheduled \(count) notifications/day for 2 days")
+        print("[BusStop] Scheduled notifications for \(daysToSchedule) days")
+    }
+
+    private func notificationsForDay(dayOffset: Int) -> Int {
+        let activeHours = max(settings.activeEndHour - settings.activeStartHour, 1)
+
+        switch settings.notificationInterval {
+        case .hour:
+            return settings.notificationCount * activeHours
+        case .day:
+            return settings.notificationCount
+        case .week:
+            let base = settings.notificationCount / 7
+            let remainder = settings.notificationCount % 7
+            return base + (dayOffset < remainder ? 1 : 0)
+        }
     }
 
     // MARK: - Developer Mode

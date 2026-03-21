@@ -5,10 +5,28 @@ final class SettingsManager: ObservableObject {
 
     static let shared = SettingsManager()
 
+    enum NotificationInterval: Int {
+        case hour = 0
+        case day = 1
+        case week = 2
+
+        var label: String {
+            switch self {
+            case .hour: return "per hour"
+            case .day: return "per day"
+            case .week: return "per week"
+            }
+        }
+    }
+
     // MARK: Notification Schedule
 
-    @Published var notificationsPerDay: Int {
-        didSet { defaults.set(notificationsPerDay, forKey: Keys.notificationsPerDay) }
+    @Published var notificationCount: Int {
+        didSet { defaults.set(notificationCount, forKey: Keys.notificationCount) }
+    }
+
+    @Published var notificationInterval: NotificationInterval {
+        didSet { defaults.set(notificationInterval.rawValue, forKey: Keys.notificationInterval) }
     }
 
     @Published var activeStartHour: Int {
@@ -39,13 +57,29 @@ final class SettingsManager: ObservableObject {
         didSet { defaults.set(developerModeEnabled, forKey: Keys.developerModeEnabled) }
     }
 
+    // MARK: Computed
+
+    /// Total notifications per day based on interval and active hours
+    var effectivePerDay: Int {
+        let activeHours = max(activeEndHour - activeStartHour, 1)
+        switch notificationInterval {
+        case .hour:
+            return notificationCount * activeHours
+        case .day:
+            return notificationCount
+        case .week:
+            return max(notificationCount / 7, 1)
+        }
+    }
+
     // MARK: - Init
 
     private let defaults = UserDefaults.standard
 
     private init() {
         let registered: [String: Any] = [
-            Keys.notificationsPerDay: 5,
+            Keys.notificationCount: 5,
+            Keys.notificationInterval: NotificationInterval.day.rawValue,
             Keys.activeStartHour: 8,
             Keys.activeEndHour: 22,
             Keys.notificationsEnabled: true,
@@ -55,7 +89,8 @@ final class SettingsManager: ObservableObject {
         ]
         defaults.register(defaults: registered)
 
-        self.notificationsPerDay = defaults.integer(forKey: Keys.notificationsPerDay)
+        self.notificationCount = defaults.integer(forKey: Keys.notificationCount)
+        self.notificationInterval = NotificationInterval(rawValue: defaults.integer(forKey: Keys.notificationInterval)) ?? .day
         self.activeStartHour = defaults.integer(forKey: Keys.activeStartHour)
         self.activeEndHour = defaults.integer(forKey: Keys.activeEndHour)
         self.notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
@@ -67,7 +102,8 @@ final class SettingsManager: ObservableObject {
     // MARK: - Keys
 
     private enum Keys {
-        static let notificationsPerDay = "bs_notificationsPerDay"
+        static let notificationCount = "bs_notificationCount"
+        static let notificationInterval = "bs_notificationInterval"
         static let activeStartHour = "bs_activeStartHour"
         static let activeEndHour = "bs_activeEndHour"
         static let notificationsEnabled = "bs_notificationsEnabled"

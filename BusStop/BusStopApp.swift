@@ -18,11 +18,9 @@ struct BusStopApp: App {
                 .environmentObject(router)
                 .environmentObject(settings)
                 .onAppear {
-                    // Wire up notification tap → router
                     notifications.onItemTapped = { [weak router] itemID in
                         router?.navigateToItem(id: itemID)
                     }
-                    // Schedule notifications on launch
                     notifications.reschedule()
                 }
         }

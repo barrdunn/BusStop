@@ -1,8 +1,5 @@
 import Foundation
 
-// Frontier Airbus A320 Memory Items — REV DATE: 10 AUG 25
-// Single source of truth. Everything else derives from this array.
-
 enum MemoryItemsData {
 
     static let all: [MemoryItem] = [
@@ -20,7 +17,7 @@ enum MemoryItemsData {
         stabilizedApproach,
     ]
 
-    static func resolved(breakDown: Bool, includeStabilized: Bool) -> [MemoryItem] {
+    static func resolved(breakDown: Bool, includeStabilized: Bool, custom: [MemoryItem] = []) -> [MemoryItem] {
         var result: [MemoryItem] = []
 
         for item in all {
@@ -34,6 +31,8 @@ enum MemoryItemsData {
         if includeStabilized {
             result.append(contentsOf: extras)
         }
+
+        result.append(contentsOf: custom)
 
         return result
     }

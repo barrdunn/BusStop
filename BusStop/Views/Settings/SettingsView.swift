@@ -20,6 +20,7 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
@@ -39,17 +40,31 @@ struct SettingsView: View {
     // MARK: - Notification Settings
 
     private var notificationSection: some View {
-        Section("Notifications") {
+        Section {
             Toggle("Enabled", isOn: $settings.notificationsEnabled)
                 .onChange(of: settings.notificationsEnabled) { _, _ in
                     notifications.reschedule()
                 }
 
-            Stepper("Per day: \(settings.notificationsPerDay)",
-                    value: $settings.notificationsPerDay, in: 1...30)
-                .onChange(of: settings.notificationsPerDay) { _, _ in
+            Stepper("\(settings.notificationCount) \(settings.notificationInterval.label)",
+                    value: $settings.notificationCount, in: 1...50)
+                .onChange(of: settings.notificationCount) { _, _ in
                     notifications.reschedule()
                 }
+
+            Picker("Frequency", selection: $settings.notificationInterval) {
+                Text("Per Hour").tag(SettingsManager.NotificationInterval.hour)
+                Text("Per Day").tag(SettingsManager.NotificationInterval.day)
+                Text("Per Week").tag(SettingsManager.NotificationInterval.week)
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: settings.notificationInterval) { _, _ in
+                notifications.reschedule()
+            }
+        } header: {
+            Text("Notifications")
+        } footer: {
+            Text("~\(settings.effectivePerDay) notifications per day between active hours.")
         }
     }
 
@@ -157,8 +172,8 @@ struct SettingsView: View {
             HStack {
                 Text("Memory Items")
                 Spacer()
-                Text("\(MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized).count)")
-                    .foregroundStyle(.secondary)
+                Text("\(MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: CustomItemsStore.shared.items).count)")
+                        .foregroundStyle(.secondary)
             }
             HStack {
                 Text("Source")
