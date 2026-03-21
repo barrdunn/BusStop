@@ -8,7 +8,7 @@ struct AddItemView: View {
     @State private var title: String = ""
     @State private var callout: String = ""
     @State private var reference: String = ""
-    @State private var body: String = ""
+    @State private var procedure: String = ""
 
     var body: some View {
         NavigationStack {
@@ -26,7 +26,7 @@ struct AddItemView: View {
                 }
 
                 Section("Procedure") {
-                    TextEditor(text: $body)
+                    TextEditor(text: $procedure)
                         .frame(minHeight: 200)
                 }
             }
@@ -38,10 +38,10 @@ struct AddItemView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        store.add(title: title, callout: callout, reference: reference, body: body)
+                        store.add(title: title, callout: callout, reference: reference, body: procedure)
                         dismiss()
                     }
-                    .disabled(title.isEmpty || body.isEmpty)
+                    .disabled(title.isEmpty || procedure.isEmpty)
                 }
             }
         }
