@@ -17,7 +17,7 @@ final class NotificationManager: NSObject {
     private let settings = SettingsManager.shared
 
     private var items: [MemoryItem] {
-        MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: CustomItemsStore.shared.items)
+        FolderStore.shared.allItems
     }
 
     private override init() {
@@ -218,14 +218,14 @@ final class NotificationManager: NSObject {
     // MARK: - Developer Mode
 
     func devSendNow() {
-        let item = items.randomElement()!
+        guard let item = items.randomElement() else { return }
         scheduleNotification(item: item, fireDate: Date().addingTimeInterval(1),
                              identifier: "bs-dev-now-\(UUID().uuidString)")
         print("[BusStop] Dev: sending \(item.title) in 1s")
     }
 
     func devSendAfter(seconds: TimeInterval) {
-        let item = items.randomElement()!
+        guard let item = items.randomElement() else { return }
         let fireDate = Date().addingTimeInterval(seconds)
         scheduleNotification(item: item, fireDate: fireDate, identifier: "bs-dev-\(UUID().uuidString)")
         print("[BusStop] Dev: scheduled \(item.title) in \(seconds)s")
@@ -234,7 +234,7 @@ final class NotificationManager: NSObject {
     func devSendBatch(count: Int, withinSeconds totalSeconds: TimeInterval) {
         for i in 0..<count {
             let delay = TimeInterval.random(in: 1...totalSeconds)
-            let item = items.randomElement()!
+            guard let item = items.randomElement() else { return }
             let fireDate = Date().addingTimeInterval(delay)
             scheduleNotification(item: item, fireDate: fireDate, identifier: "bs-dev-batch-\(i)-\(UUID().uuidString)")
             print("[BusStop] Dev batch: \(item.title) in \(Int(delay))s")

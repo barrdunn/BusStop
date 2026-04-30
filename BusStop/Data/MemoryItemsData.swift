@@ -2,7 +2,8 @@ import Foundation
 
 enum MemoryItemsData {
 
-    static let all: [MemoryItem] = [
+    /// Default Memory Items folder seed used on first launch.
+    static let memoryItemsSeed: [MemoryItem] = [
         tawsWarnings,
         lossOfBraking,
         emergencyDescent,
@@ -11,31 +12,8 @@ enum MemoryItemsData {
         tcasWarnings,
         unreliableSpeed,
         windshearReactive,
-    ]
-
-    static let extras: [MemoryItem] = [
         stabilizedApproach,
     ]
-
-    static func resolved(breakDown: Bool, includeStabilized: Bool, custom: [MemoryItem] = []) -> [MemoryItem] {
-        var result: [MemoryItem] = []
-
-        for item in all {
-            if breakDown, let subs = item.subItems {
-                result.append(contentsOf: subs)
-            } else {
-                result.append(item)
-            }
-        }
-
-        if includeStabilized {
-            result.append(contentsOf: extras)
-        }
-
-        result.append(contentsOf: custom)
-
-        return result
-    }
 
     // MARK: - 1
 
@@ -150,36 +128,7 @@ enum MemoryItemsData {
           - Respond promptly and smoothly
         • VERTICAL SPEED — ADJUST OR MAINTAIN
           - Adjust or maintain the vertical speed as required to reach the green area and/or avoid the red area of the vertical speed scale
-        """,
-        subItems: [
-            MemoryItem(
-                id: "tcas-blue",
-                title: "TCAS – \"TCAS BLUE\"",
-                callout: "TCAS BLUE",
-                reference: "Refer to Vol II - ABN - SURV - TCAS WARNINGS - RESOLUTION ADVISORY",
-                body: """
-                (AP/FD TCAS Installed)
-                • If the AP is OFF
-                  - FD ORDERS — FOLLOW
-                  - The AP can be engaged
-                • VERTICAL SPEED — MONITOR
-                """
-            ),
-            MemoryItem(
-                id: "tcas-i-have-control",
-                title: "TCAS – \"I HAVE CONTROL\"",
-                callout: "TCAS, I HAVE CONTROL",
-                reference: "Refer to Vol II - ABN - SURV - TCAS WARNINGS - RESOLUTION ADVISORY",
-                body: """
-                (NO TCAS FMA)
-                • AP (if engaged) — OFF
-                • BOTH FD's — OFF
-                  - Respond promptly and smoothly
-                • VERTICAL SPEED — ADJUST OR MAINTAIN
-                  - Adjust or maintain the vertical speed as required to reach the green area and/or avoid the red area of the vertical speed scale
-                """
-            ),
-        ]
+        """
     )
 
     // MARK: - 7
@@ -229,47 +178,7 @@ enum MemoryItemsData {
         • DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL OUT OF WINDSHEAR
         • CAREFULLY MONITOR FLIGHT PATH AND SPEED
         • WHEN OUT, SMOOTHLY RECOVER NORMAL CLIMB
-        """,
-        subItems: [
-            MemoryItem(
-                id: "windshear-before-v1",
-                title: "Windshear – Before V1",
-                callout: "WINDSHEAR TOGA",
-                reference: "Refer to Vol II - ABN - SURV - [MEM] WINDSHEAR WARNING - REACTIVE WINDSHEAR",
-                body: """
-                At Takeoff - Before V1:
-                • If significant variations in airspeed and trend below indicated V1, REJECT THE TAKEOFF
-                """
-            ),
-            MemoryItem(
-                id: "windshear-after-v1",
-                title: "Windshear – After V1",
-                callout: "WINDSHEAR TOGA",
-                reference: "Refer to Vol II - ABN - SURV - [MEM] WINDSHEAR WARNING - REACTIVE WINDSHEAR",
-                body: """
-                At Takeoff - After V1:
-                • THR LEVERS — TOGA
-                • REACHING Vʀ — ROTATE
-                • SRS ORDERS — FOLLOW
-                  - This includes full back stick if demanded.
-                """
-            ),
-            MemoryItem(
-                id: "windshear-airborne",
-                title: "Windshear – Airborne/Landing",
-                callout: "WINDSHEAR TOGA",
-                reference: "Refer to Vol II - ABN - SURV - [MEM] WINDSHEAR WARNING - REACTIVE WINDSHEAR",
-                body: """
-                Airborne, initial climb or landing:
-                • THR LEVERS AT TOGA — SET OR CONFIRM
-                • AP (if engaged) — KEEP ON
-                • SRS ORDERS — FOLLOW
-                • DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL OUT OF WINDSHEAR
-                • CAREFULLY MONITOR FLIGHT PATH AND SPEED
-                • WHEN OUT, SMOOTHLY RECOVER NORMAL CLIMB
-                """
-            ),
-        ]
+        """
     )
 
     // MARK: - Extras

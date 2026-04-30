@@ -1,19 +1,28 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
 
     @EnvironmentObject var settings: SettingsManager
+    @ObservedObject private var folderStore = FolderStore.shared
 
     @State private var devDelaySeconds: Double = 5
     @State private var devBatchCount: Double = 3
     @State private var devBatchMinutes: Double = 1
+
+    @State private var exportURL: URL? = nil
+    @State private var showingImporter = false
+    @State private var pendingImportText: String? = nil
+    @State private var showingReplaceConfirm = false
+    @State private var showingClearConfirm = false
+    @State private var importError: String? = nil
 
     private let notifications = NotificationManager.shared
 
     var body: some View {
         NavigationStack {
             Form {
-                studySection
+                dataSection
                 notificationSection
                 scheduleSection
                 developerSection
@@ -21,19 +30,76 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear { refreshExportFile() }
+            .onChange(of: folderStore.folders) { _, _ in refreshExportFile() }
+        }
+        .fileImporter(
+            isPresented: $showingImporter,
+            allowedContentTypes: [.commaSeparatedText, .plainText],
+            allowsMultipleSelection: false
+        ) { result in
+            handleImportSelection(result)
+        }
+        .confirmationDialog(
+            "Replace all folders and items with the contents of this CSV? This cannot be undone.",
+            isPresented: $showingReplaceConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Replace All", role: .destructive) {
+                performReplaceImport()
+            }
+            Button("Cancel", role: .cancel) {
+                pendingImportText = nil
+            }
+        }
+        .confirmationDialog(
+            "Remove every item from every folder? Folders themselves are kept.",
+            isPresented: $showingClearConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Clear All Items", role: .destructive) {
+                folderStore.clearAllItems()
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+        .alert("Import Failed", isPresented: Binding(
+            get: { importError != nil },
+            set: { if !$0 { importError = nil } }
+        )) {
+            Button("OK", role: .cancel) { importError = nil }
+        } message: {
+            Text(importError ?? "")
         }
     }
 
-    // MARK: - Study
+    // MARK: - Data
 
-    private var studySection: some View {
+    private var dataSection: some View {
         Section {
-            Toggle("Break Down Items", isOn: $settings.breakDownItems)
-            Toggle("Stabilized Approach Criteria", isOn: $settings.includeStabilized)
+            if let url = exportURL {
+                ShareLink(item: url) {
+                    Label("Export All as CSV", systemImage: "square.and.arrow.up")
+                }
+            } else {
+                Label("Export All as CSV", systemImage: "square.and.arrow.up")
+                    .foregroundStyle(.secondary)
+            }
+
+            Button {
+                showingImporter = true
+            } label: {
+                Label("Replace All from CSV…", systemImage: "square.and.arrow.down")
+            }
+
+            Button(role: .destructive) {
+                showingClearConfirm = true
+            } label: {
+                Label("Clear All Items", systemImage: "trash")
+            }
         } header: {
-            Text("Items")
+            Text("Data")
         } footer: {
-            Text("Break Down splits TCAS (2) and Windshear (3) into separate items. Stabilized Approach adds approach criteria to the item pool.")
+            Text("CSV columns: folder, title, callout, reference, body. Per-folder import is available from each folder.")
         }
     }
 
@@ -170,10 +236,16 @@ struct SettingsView: View {
     private var aboutSection: some View {
         Section("About") {
             HStack {
-                Text("Memory Items")
+                Text("Folders")
                 Spacer()
-                Text("\(MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: CustomItemsStore.shared.items).count)")
-                        .foregroundStyle(.secondary)
+                Text("\(folderStore.folders.count)")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Total Items")
+                Spacer()
+                Text("\(folderStore.allItems.count)")
+                    .foregroundStyle(.secondary)
             }
             HStack {
                 Text("Source")
@@ -194,5 +266,41 @@ struct SettingsView: View {
         components.hour = hour
         let date = Calendar.current.date(from: components) ?? Date()
         return formatter.string(from: date)
+    }
+
+    private func refreshExportFile() {
+        let csv = CSVService.exportCSV(folders: folderStore.folders)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmm"
+        let name = "busstop-\(formatter.string(from: Date())).csv"
+        exportURL = try? CSVService.writeTempCSV(csv, fileName: name)
+    }
+
+    private func handleImportSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            do {
+                pendingImportText = try String(contentsOf: url, encoding: .utf8)
+                showingReplaceConfirm = true
+            } catch {
+                importError = error.localizedDescription
+            }
+        case .failure(let error):
+            importError = error.localizedDescription
+        }
+    }
+
+    private func performReplaceImport() {
+        guard let text = pendingImportText else { return }
+        defer { pendingImportText = nil }
+        do {
+            try CSVService.importReplacingAll(csv: text, into: folderStore)
+            refreshExportFile()
+        } catch {
+            importError = error.localizedDescription
+        }
     }
 }

@@ -1,78 +1,105 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ItemListView: View {
 
-    @EnvironmentObject var router: Router
-    @EnvironmentObject var settings: SettingsManager
-    @ObservedObject var customStore = CustomItemsStore.shared
-    @State private var path: [String] = []
-    @State private var showingAddSheet: Bool = false
+    let folder: Folder
+    @Binding var path: [ItemsRoute]
 
-    private var items: [MemoryItem] {
-        MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: customStore.items)
+    @ObservedObject var store = FolderStore.shared
+
+    @State private var showingAddSheet = false
+    @State private var showingImporter = false
+    @State private var importError: String? = nil
+
+    private var liveFolder: Folder {
+        store.folder(id: folder.id) ?? folder
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            List {
-                ForEach(items) { item in
-                    NavigationLink(value: item.id) {
+        List {
+            if liveFolder.items.isEmpty {
+                Text("No items yet. Tap + to add one, or import a CSV from the menu.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                ForEach(liveFolder.items) { item in
+                    NavigationLink(value: ItemsRoute.item(folderID: liveFolder.id, itemID: item.id)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(item.title)
-                                    .font(.headline)
-                                if item.id.hasPrefix("custom-") {
-                                    Spacer()
-                                    Text("Custom")
-                                        .font(.caption2)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Capsule().fill(.blue))
-                                }
+                            Text(item.title)
+                                .font(.headline)
+                            if !item.callout.isEmpty {
+                                Text("\"\(item.callout)\"")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
                             }
-                            Text("\"\(item.callout)\"")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 4)
                     }
                 }
                 .onDelete { offsets in
-                    let builtInCount = items.count - customStore.items.count
-                    let customOffsets = IndexSet(offsets.compactMap { index in
-                        let adjustedIndex = index - builtInCount
-                        return adjustedIndex >= 0 ? adjustedIndex : nil
-                    })
-                    if !customOffsets.isEmpty {
-                        customStore.remove(at: customOffsets)
-                    }
+                    store.deleteItems(folderID: liveFolder.id, at: offsets)
                 }
-            }
-            .id("\(settings.breakDownItems)-\(settings.includeStabilized)-\(customStore.items.count)")
-            .navigationTitle("Memory Items")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingAddSheet = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingAddSheet) {
-                AddItemView()
-            }
-            .navigationDestination(for: String.self) { itemID in
-                if let item = items.first(where: { $0.id == itemID }) {
-                    ItemDetailView(item: item)
+                .onMove { source, destination in
+                    store.moveItems(folderID: liveFolder.id, from: source, to: destination)
                 }
             }
         }
-        .onChange(of: router.pendingItemID) { _, itemID in
-            guard let itemID else { return }
-            path = [itemID]
-            router.pendingItemID = nil
+        .navigationTitle(liveFolder.name)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        showingAddSheet = true
+                    } label: {
+                        Label("Add Item", systemImage: "plus")
+                    }
+                    Button {
+                        showingImporter = true
+                    } label: {
+                        Label("Import CSV…", systemImage: "square.and.arrow.down")
+                    }
+                    EditButton()
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
+        .sheet(isPresented: $showingAddSheet) {
+            AddItemView(folderID: liveFolder.id)
+        }
+        .fileImporter(
+            isPresented: $showingImporter,
+            allowedContentTypes: [.commaSeparatedText, .plainText],
+            allowsMultipleSelection: false
+        ) { result in
+            handleImport(result)
+        }
+        .alert("Import Failed", isPresented: Binding(
+            get: { importError != nil },
+            set: { if !$0 { importError = nil } }
+        )) {
+            Button("OK", role: .cancel) { importError = nil }
+        } message: {
+            Text(importError ?? "")
+        }
+    }
+
+    private func handleImport(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            do {
+                let text = try String(contentsOf: url, encoding: .utf8)
+                try CSVService.importAppending(csv: text, folderID: liveFolder.id, into: store)
+            } catch {
+                importError = error.localizedDescription
+            }
+        case .failure(let error):
+            importError = error.localizedDescription
         }
     }
 }

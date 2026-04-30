@@ -6,7 +6,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $router.selectedTab) {
-            ItemListView()
+            FolderListView()
                 .tabItem {
                     Label("Items", systemImage: "list.bullet")
                 }

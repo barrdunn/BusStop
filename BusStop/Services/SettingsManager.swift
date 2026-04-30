@@ -41,16 +41,6 @@ final class SettingsManager: ObservableObject {
         didSet { defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled) }
     }
 
-    // MARK: Study Options
-
-    @Published var breakDownItems: Bool {
-        didSet { defaults.set(breakDownItems, forKey: Keys.breakDownItems) }
-    }
-
-    @Published var includeStabilized: Bool {
-        didSet { defaults.set(includeStabilized, forKey: Keys.includeStabilized) }
-    }
-
     // MARK: Developer Mode
 
     @Published var developerModeEnabled: Bool {
@@ -83,8 +73,6 @@ final class SettingsManager: ObservableObject {
             Keys.activeStartHour: 8,
             Keys.activeEndHour: 22,
             Keys.notificationsEnabled: true,
-            Keys.breakDownItems: false,
-            Keys.includeStabilized: false,
             Keys.developerModeEnabled: false,
         ]
         defaults.register(defaults: registered)
@@ -94,8 +82,6 @@ final class SettingsManager: ObservableObject {
         self.activeStartHour = defaults.integer(forKey: Keys.activeStartHour)
         self.activeEndHour = defaults.integer(forKey: Keys.activeEndHour)
         self.notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
-        self.breakDownItems = defaults.bool(forKey: Keys.breakDownItems)
-        self.includeStabilized = defaults.bool(forKey: Keys.includeStabilized)
         self.developerModeEnabled = defaults.bool(forKey: Keys.developerModeEnabled)
     }
 
@@ -107,8 +93,6 @@ final class SettingsManager: ObservableObject {
         static let activeStartHour = "bs_activeStartHour"
         static let activeEndHour = "bs_activeEndHour"
         static let notificationsEnabled = "bs_notificationsEnabled"
-        static let breakDownItems = "bs_breakDownItems"
-        static let includeStabilized = "bs_includeStabilized"
         static let developerModeEnabled = "bs_developerModeEnabled"
     }
 }

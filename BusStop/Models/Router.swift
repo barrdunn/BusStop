@@ -1,6 +1,11 @@
 import SwiftUI
 import Combine
 
+enum ItemsRoute: Hashable {
+    case folder(String)
+    case item(folderID: String, itemID: String)
+}
+
 final class Router: ObservableObject {
 
     enum Tab: Int {

@@ -2,12 +2,10 @@ import SwiftUI
 
 struct StudyView: View {
     
-    @EnvironmentObject var settings: SettingsManager
-    
-    @ObservedObject var customStore = CustomItemsStore.shared
-    
+    @ObservedObject var folderStore = FolderStore.shared
+
     private var items: [MemoryItem] {
-        MemoryItemsData.resolved(breakDown: settings.breakDownItems, includeStabilized: settings.includeStabilized, custom: customStore.items)
+        folderStore.allItems
     }
     
     @State private var shuffled: [MemoryItem] = []
@@ -54,8 +52,7 @@ struct StudyView: View {
         .onAppear {
             if shuffled.isEmpty { reshuffle() }
         }
-        .onChange(of: settings.breakDownItems) { _, _ in reshuffle() }
-        .onChange(of: settings.includeStabilized) { _, _ in reshuffle() }
+        .onChange(of: folderStore.folders) { _, _ in reshuffle() }
     }
     
     // MARK: - Card
