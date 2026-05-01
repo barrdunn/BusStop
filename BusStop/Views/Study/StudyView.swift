@@ -20,6 +20,24 @@ struct StudyView: View {
             .flatMap { $0.items }
     }
 
+    private var selectedFolders: [Folder] {
+        folderStore.folders.filter { !settings.disabledStudyFolderIDs.contains($0.id) }
+    }
+
+    private var selectionSummary: String {
+        let folders = selectedFolders
+        let count = items.count
+        let countSuffix = " · \(count) item\(count == 1 ? "" : "s")"
+        if folders.isEmpty {
+            return "No folders selected"
+        }
+        if folders.count == folderStore.folders.count {
+            return "All folders" + countSuffix
+        }
+        let names = folders.map { $0.name }.joined(separator: ", ")
+        return names + countSuffix
+    }
+
     @State private var shuffled: [MemoryItem] = []
     @State private var currentIndex: Int = 0
     @State private var showAnswer: Bool = false
@@ -35,16 +53,27 @@ struct StudyView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
-                Text("Study")
-                    .font(.largeTitle.bold())
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Study")
+                        .font(.largeTitle.bold())
+
+                    Button { showingFolderPicker = true } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "folder")
+                                .font(.caption)
+                            Text(selectionSummary)
+                                .font(.subheadline)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                            Image(systemName: "chevron.down")
+                                .font(.caption2)
+                        }
+                        .foregroundStyle(items.isEmpty ? Color.red : Color.blue)
+                    }
+                    .buttonStyle(.plain)
+                }
 
                 Spacer()
-
-                Button { showingFolderPicker = true } label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle\(settings.disabledStudyFolderIDs.isEmpty ? "" : ".fill")")
-                        .font(.title2)
-                        .foregroundStyle(settings.disabledStudyFolderIDs.isEmpty ? Color.secondary : Color.blue)
-                }
 
                 Button { toggleShuffle() } label: {
                     Image(systemName: "shuffle")
@@ -61,9 +90,9 @@ struct StudyView: View {
                 Spacer()
                 if items.isEmpty {
                     VStack(spacing: 8) {
-                        Text("No items selected")
+                        Text("No items to study")
                             .font(.headline)
-                        Text("Tap the filter icon to choose folders to study.")
+                        Text("Tap the folder name above to choose folders.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
