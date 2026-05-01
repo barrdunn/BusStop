@@ -48,6 +48,18 @@ final class SettingsManager: ObservableObject {
         didSet { defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled) }
     }
 
+    // MARK: Folder Selection
+
+    /// Folder IDs explicitly excluded from the study deck. Empty = all folders.
+    @Published var disabledStudyFolderIDs: Set<String> {
+        didSet { Self.saveSet(disabledStudyFolderIDs, key: Keys.disabledStudyFolderIDs, defaults: defaults) }
+    }
+
+    /// Folder IDs explicitly excluded from notifications. Empty = all folders.
+    @Published var disabledNotificationFolderIDs: Set<String> {
+        didSet { Self.saveSet(disabledNotificationFolderIDs, key: Keys.disabledNotificationFolderIDs, defaults: defaults) }
+    }
+
     // MARK: Developer Mode
 
     @Published var developerModeEnabled: Bool {
@@ -90,6 +102,20 @@ final class SettingsManager: ObservableObject {
         self.activeEndHour = defaults.integer(forKey: Keys.activeEndHour)
         self.notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
         self.developerModeEnabled = defaults.bool(forKey: Keys.developerModeEnabled)
+        self.disabledStudyFolderIDs = Self.loadSet(key: Keys.disabledStudyFolderIDs, defaults: defaults)
+        self.disabledNotificationFolderIDs = Self.loadSet(key: Keys.disabledNotificationFolderIDs, defaults: defaults)
+    }
+
+    private static func saveSet(_ set: Set<String>, key: String, defaults: UserDefaults) {
+        if let data = try? JSONEncoder().encode(Array(set)) {
+            defaults.set(data, forKey: key)
+        }
+    }
+
+    private static func loadSet(key: String, defaults: UserDefaults) -> Set<String> {
+        guard let data = defaults.data(forKey: key),
+              let arr = try? JSONDecoder().decode([String].self, from: data) else { return [] }
+        return Set(arr)
     }
 
     // MARK: - Keys
@@ -101,5 +127,7 @@ final class SettingsManager: ObservableObject {
         static let activeEndHour = "bs_activeEndHour"
         static let notificationsEnabled = "bs_notificationsEnabled"
         static let developerModeEnabled = "bs_developerModeEnabled"
+        static let disabledStudyFolderIDs = "bs_disabledStudyFolderIDs"
+        static let disabledNotificationFolderIDs = "bs_disabledNotificationFolderIDs"
     }
 }

@@ -8,51 +8,75 @@
 import SwiftUI
 
 struct StudyView: View {
-    
+
+    @EnvironmentObject var settings: SettingsManager
     @ObservedObject var folderStore = FolderStore.shared
 
+    @State private var showingFolderPicker = false
+
     private var items: [MemoryItem] {
-        folderStore.allItems
+        folderStore.folders
+            .filter { !settings.disabledStudyFolderIDs.contains($0.id) }
+            .flatMap { $0.items }
     }
-    
+
     @State private var shuffled: [MemoryItem] = []
     @State private var currentIndex: Int = 0
     @State private var showAnswer: Bool = false
     @State private var flipDegrees: Double = 0
     @State private var shuffleAngle: Double = 0
     @State private var shuffleMode: Bool = false
-    
+
     @State private var dragOffset: CGSize = .zero
     @State private var isDragging: Bool = false
     @State private var animatingSwipe: Bool = false
     @State private var swipeDirection: CGFloat = 0
-    
+
     var body: some View {
         VStack(spacing: 0) {
+            HStack(alignment: .center) {
+                Text("Study")
+                    .font(.largeTitle.bold())
+
+                Spacer()
+
+                Button { showingFolderPicker = true } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle\(settings.disabledStudyFolderIDs.isEmpty ? "" : ".fill")")
+                        .font(.title2)
+                        .foregroundStyle(settings.disabledStudyFolderIDs.isEmpty ? .secondary : .blue)
+                }
+
+                Button { toggleShuffle() } label: {
+                    Image(systemName: "shuffle")
+                        .font(.title2)
+                        .foregroundStyle(shuffleMode ? .blue : .secondary)
+                        .rotationEffect(.degrees(shuffleAngle))
+                }
+                .padding(.leading, 12)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 50)
+
             if shuffled.isEmpty {
                 Spacer()
-                ProgressView()
+                if items.isEmpty {
+                    VStack(spacing: 8) {
+                        Text("No items selected")
+                            .font(.headline)
+                        Text("Tap the filter icon to choose folders to study.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                } else {
+                    ProgressView()
+                }
                 Spacer()
             } else {
-                HStack(alignment: .center) {
-                    Text("Study")
-                        .font(.largeTitle.bold())
-                    
-                    Spacer()
-                    
-                    Button { toggleShuffle() } label: {
-                        Image(systemName: "shuffle")
-                            .font(.title2)
-                            .foregroundStyle(shuffleMode ? .blue : .secondary)
-                            .rotationEffect(.degrees(shuffleAngle))
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 50)
-                
                 cardView
                     .padding(.horizontal, 20)
-                
+
                 Spacer()
             }
         }
@@ -60,6 +84,14 @@ struct StudyView: View {
             if shuffled.isEmpty { reshuffle() }
         }
         .onChange(of: folderStore.folders) { _, _ in reshuffle() }
+        .onChange(of: settings.disabledStudyFolderIDs) { _, _ in reshuffle() }
+        .sheet(isPresented: $showingFolderPicker) {
+            FolderSelectionView(
+                title: "Study Folders",
+                footer: "Selected folders feed the study deck.",
+                disabledFolderIDs: $settings.disabledStudyFolderIDs
+            )
+        }
     }
     
     // MARK: - Card

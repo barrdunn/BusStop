@@ -59,7 +59,7 @@ struct AddItemView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
-                        .disabled(title.isEmpty || procedure.isEmpty)
+                        .disabled(title.isEmpty)
                 }
             }
         }

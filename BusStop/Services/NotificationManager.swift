@@ -24,7 +24,10 @@ final class NotificationManager: NSObject {
     private let settings = SettingsManager.shared
 
     private var items: [MemoryItem] {
-        FolderStore.shared.allItems
+        let disabled = settings.disabledNotificationFolderIDs
+        return FolderStore.shared.folders
+            .filter { !disabled.contains($0.id) }
+            .flatMap { $0.items }
     }
 
     private override init() {

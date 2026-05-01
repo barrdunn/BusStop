@@ -23,17 +23,17 @@ struct SettingsView: View {
     @State private var showingReplaceConfirm = false
     @State private var showingClearConfirm = false
     @State private var importError: String? = nil
+    @State private var showingNotificationFolderPicker = false
 
     private let notifications = NotificationManager.shared
 
     var body: some View {
         NavigationStack {
             Form {
-                dataSection
                 notificationSection
                 scheduleSection
+                dataSection
                 developerSection
-                aboutSection
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -134,11 +134,44 @@ struct SettingsView: View {
             .onChange(of: settings.notificationInterval) { _, _ in
                 notifications.reschedule()
             }
+
+            Button {
+                showingNotificationFolderPicker = true
+            } label: {
+                HStack {
+                    Label("Folders", systemImage: "folder")
+                    Spacer()
+                    Text(notificationFolderSummary)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .foregroundStyle(.primary)
         } header: {
             Text("Notifications")
         } footer: {
             Text("~\(settings.effectivePerDay) notifications per day between active hours.")
         }
+        .sheet(isPresented: $showingNotificationFolderPicker, onDismiss: {
+            notifications.reschedule()
+        }) {
+            FolderSelectionView(
+                title: "Notification Folders",
+                footer: "Notifications are drawn from items in the selected folders.",
+                disabledFolderIDs: $settings.disabledNotificationFolderIDs
+            )
+        }
+    }
+
+    private var notificationFolderSummary: String {
+        let total = folderStore.folders.count
+        let disabled = settings.disabledNotificationFolderIDs.intersection(Set(folderStore.folders.map { $0.id })).count
+        let enabled = total - disabled
+        if disabled == 0 { return "All" }
+        if enabled == 0 { return "None" }
+        return "\(enabled) of \(total)"
     }
 
     private var scheduleSection: some View {
@@ -235,32 +268,6 @@ struct SettingsView: View {
             }
         } header: {
             Text("Developer")
-        }
-    }
-
-    // MARK: - About
-
-    private var aboutSection: some View {
-        Section("About") {
-            HStack {
-                Text("Folders")
-                Spacer()
-                Text("\(folderStore.folders.count)")
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Total Items")
-                Spacer()
-                Text("\(folderStore.allItems.count)")
-                    .foregroundStyle(.secondary)
-            }
-            HStack {
-                Text("Source")
-                Spacer()
-                Text("Frontier A320 – Rev 10 Aug 25")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
         }
     }
 

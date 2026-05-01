@@ -42,9 +42,11 @@ struct ItemDetailView: View {
                         .padding(.top, 12)
                 }
 
-                Text(liveItem.body)
-                    .font(.system(.body, design: .monospaced))
-                    .padding(16)
+                if !liveItem.body.isEmpty {
+                    Text(liveItem.body)
+                        .font(.system(.body, design: .monospaced))
+                        .padding(16)
+                }
             }
             .padding(.bottom, 32)
         }
