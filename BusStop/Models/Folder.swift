@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Folder: Identifiable, Codable, Hashable {
+nonisolated struct Folder: Identifiable, Codable, Hashable {
     let id: String
     var name: String
     var items: [MemoryItem]

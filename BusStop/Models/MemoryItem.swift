@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MemoryItem: Identifiable, Codable, Hashable {
+nonisolated struct MemoryItem: Identifiable, Codable, Hashable {
     let id: String
     var title: String
     var callout: String
