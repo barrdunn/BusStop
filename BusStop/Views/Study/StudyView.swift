@@ -43,13 +43,13 @@ struct StudyView: View {
                 Button { showingFolderPicker = true } label: {
                     Image(systemName: "line.3.horizontal.decrease.circle\(settings.disabledStudyFolderIDs.isEmpty ? "" : ".fill")")
                         .font(.title2)
-                        .foregroundStyle(settings.disabledStudyFolderIDs.isEmpty ? .secondary : .blue)
+                        .foregroundStyle(settings.disabledStudyFolderIDs.isEmpty ? Color.secondary : Color.blue)
                 }
 
                 Button { toggleShuffle() } label: {
                     Image(systemName: "shuffle")
                         .font(.title2)
-                        .foregroundStyle(shuffleMode ? .blue : .secondary)
+                        .foregroundStyle(shuffleMode ? Color.blue : Color.secondary)
                         .rotationEffect(.degrees(shuffleAngle))
                 }
                 .padding(.leading, 12)
@@ -216,9 +216,9 @@ struct StudyView: View {
     private func swipeOut(direction: CGFloat, lastY: CGFloat) {
         animatingSwipe = true
         swipeDirection = direction
-        
-        let screenWidth = UIScreen.main.bounds.width
-        let exitX = direction * (screenWidth + 100)
+
+        let exitDistance: CGFloat = 1200
+        let exitX = direction * exitDistance
         let yRatio = dragOffset.width != 0 ? lastY / abs(dragOffset.width) : 0
         let exitY = abs(exitX) * yRatio
         
@@ -238,7 +238,7 @@ struct StudyView: View {
             resetFlip()
             animatingSwipe = false
             
-            dragOffset = CGSize(width: -swipeDirection * (screenWidth + 100), height: 0)
+            dragOffset = CGSize(width: -swipeDirection * exitDistance, height: 0)
             
             withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                 dragOffset = .zero

@@ -36,7 +36,7 @@ struct FolderSelectionView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: isEnabled(folder.id) ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(isEnabled(folder.id) ? .blue : .secondary)
+                                        .foregroundStyle(isEnabled(folder.id) ? Color.blue : Color.secondary)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(folder.name)
                                             .foregroundStyle(.primary)
