@@ -7,7 +7,8 @@
 
 import Foundation
 
-nonisolated enum CSVService {
+@MainActor
+enum CSVService {
 
     static let header = ["folder", "title", "callout", "reference", "body"]
 
