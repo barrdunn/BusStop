@@ -1,3 +1,10 @@
+//
+//  FolderStore.swift
+//  BusStop
+//
+//  Created by Barry Dunn on 5/1/26.
+//
+
 import Foundation
 import Combine
 
