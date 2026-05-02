@@ -37,7 +37,7 @@ struct ItemDetailView: View {
                 if !liveItem.reference.isEmpty {
                     Text(liveItem.reference)
                         .font(.footnote.bold())
-                        .foregroundStyle(liveItem.isEmergency ? Color.red : Color.secondary)
+                        .foregroundStyle(liveItem.isAbnormal ? Color.red : Color.secondary)
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
                 }

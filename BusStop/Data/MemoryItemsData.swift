@@ -37,7 +37,7 @@ enum MemoryItemsData {
         • BANK — WINGS LEVEL or ADJUST
         • DO NOT CHANGE CONFIGURATION (SLATS/FLAP, GEAR) UNTIL CLEAR OF OBSTACLE
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 2
@@ -58,7 +58,7 @@ enum MemoryItemsData {
         If still no braking:
         • PARK BRAKE — SHORT SUCCESSIVE APPLICATIONS
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 3
@@ -78,7 +78,7 @@ enum MemoryItemsData {
 
         • SPD BRK — FULL
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 4
@@ -100,7 +100,7 @@ enum MemoryItemsData {
         If in clean configuration and below 20,000 feet:
         • FLAP 1 — SELECT
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 5
@@ -117,7 +117,7 @@ enum MemoryItemsData {
         • PITCH ATTITUDE — 15°
         • BANK — WINGS LEVEL
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 6
@@ -141,7 +141,7 @@ enum MemoryItemsData {
         • VERTICAL SPEED — ADJUST OR MAINTAIN
           - Adjust or maintain the vertical speed as required to reach the green area and/or avoid the red area of the vertical speed scale
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 7
@@ -165,7 +165,7 @@ enum MemoryItemsData {
         • L/G — UP
         • When at or above MSA or Circuit Altitude: Level off for troubleshooting
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - 8
@@ -193,7 +193,7 @@ enum MemoryItemsData {
         • CAREFULLY MONITOR FLIGHT PATH AND SPEED
         • WHEN OUT, SMOOTHLY RECOVER NORMAL CLIMB
         """,
-        isEmergency: true
+        isAbnormal: true
     )
 
     // MARK: - Extras
@@ -217,6 +217,6 @@ enum MemoryItemsData {
         • Within -5 to +15 knots of target speed for approach
         • Thrust stabilized, usually above idle, commensurate with what is required to maintain the target speed criteria
         """,
-        isEmergency: false
+        isAbnormal: false
     )
 }

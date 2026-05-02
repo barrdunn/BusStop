@@ -192,7 +192,7 @@ struct StudyView: View {
             if !currentItem.reference.isEmpty {
                 Text(currentItem.reference)
                     .font(.subheadline)
-                    .foregroundStyle(currentItem.isEmergency ? Color.red : Color.secondary)
+                    .foregroundStyle(currentItem.isAbnormal ? Color.red : Color.secondary)
                     .multilineTextAlignment(.center)
             }
             

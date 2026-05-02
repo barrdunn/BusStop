@@ -19,7 +19,7 @@ struct AddItemView: View {
     @State private var callout: String
     @State private var reference: String
     @State private var procedure: String
-    @State private var isEmergency: Bool
+    @State private var isAbnormal: Bool
 
     init(folderID: String, editingItem: MemoryItem? = nil) {
         self.folderID = folderID
@@ -28,7 +28,7 @@ struct AddItemView: View {
         _callout = State(initialValue: editingItem?.callout ?? "")
         _reference = State(initialValue: editingItem?.reference ?? "")
         _procedure = State(initialValue: editingItem?.body ?? "")
-        _isEmergency = State(initialValue: editingItem?.isEmergency ?? false)
+        _isAbnormal = State(initialValue: editingItem?.isAbnormal ?? false)
     }
 
     private var isEditing: Bool { editingItem != nil }
@@ -49,12 +49,12 @@ struct AddItemView: View {
                 }
 
                 Section {
-                    Toggle(isOn: $isEmergency) {
-                        Label("Emergency Procedure", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(isEmergency ? Color.red : Color.primary)
+                    Toggle(isOn: $isAbnormal) {
+                        Label("Abnormal Procedure", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(isAbnormal ? Color.red : Color.primary)
                     }
                 } footer: {
-                    Text("Emergency items are marked with a red dot in the list and a red reference.")
+                    Text("Abnormal items are marked with a red dot in the list and a red reference.")
                 }
 
                 Section("Procedure") {
@@ -84,14 +84,14 @@ struct AddItemView: View {
                              callout: callout,
                              reference: reference,
                              body: procedure,
-                             isEmergency: isEmergency)
+                             isAbnormal: isAbnormal)
         } else {
             store.addItem(folderID: folderID,
                           title: title,
                           callout: callout,
                           reference: reference,
                           body: procedure,
-                          isEmergency: isEmergency)
+                          isAbnormal: isAbnormal)
         }
         dismiss()
     }

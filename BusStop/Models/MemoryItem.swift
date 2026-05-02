@@ -13,24 +13,24 @@ nonisolated struct MemoryItem: Identifiable, Codable, Hashable {
     var callout: String
     var reference: String
     var body: String
-    var isEmergency: Bool
+    var isAbnormal: Bool
 
     init(id: String = "item-\(UUID().uuidString)",
          title: String,
          callout: String,
          reference: String = "",
          body: String,
-         isEmergency: Bool = false) {
+         isAbnormal: Bool = false) {
         self.id = id
         self.title = title
         self.callout = callout
         self.reference = reference
         self.body = body
-        self.isEmergency = isEmergency
+        self.isAbnormal = isAbnormal
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, title, callout, reference, body, isEmergency
+        case id, title, callout, reference, body, isAbnormal
     }
 
     init(from decoder: Decoder) throws {
@@ -40,6 +40,6 @@ nonisolated struct MemoryItem: Identifiable, Codable, Hashable {
         self.callout = try c.decode(String.self, forKey: .callout)
         self.reference = try c.decode(String.self, forKey: .reference)
         self.body = try c.decode(String.self, forKey: .body)
-        self.isEmergency = (try? c.decode(Bool.self, forKey: .isEmergency)) ?? false
+        self.isAbnormal = (try? c.decode(Bool.self, forKey: .isAbnormal)) ?? false
     }
 }

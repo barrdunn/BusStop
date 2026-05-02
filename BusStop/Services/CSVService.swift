@@ -11,7 +11,7 @@ import Foundation
 enum CSVService {
 
     static let baseHeader = ["folder", "title", "callout", "reference", "body"]
-    static let exportHeader = baseHeader + ["emergency"]
+    static let exportHeader = baseHeader + ["abnormal"]
 
     struct ParsedRow {
         let folder: String
@@ -19,7 +19,7 @@ enum CSVService {
         let callout: String
         let reference: String
         let body: String
-        let isEmergency: Bool
+        let isAbnormal: Bool
     }
 
     enum ImportError: Error, LocalizedError {
@@ -48,7 +48,7 @@ enum CSVService {
                     item.callout,
                     item.reference,
                     item.body,
-                    item.isEmergency ? "true" : "false",
+                    item.isAbnormal ? "true" : "false",
                 ]
                 lines.append(row.map(escape).joined(separator: ","))
             }
@@ -100,7 +100,7 @@ enum CSVService {
                 callout: padded[2],
                 reference: padded[3],
                 body: padded[4],
-                isEmergency: emergency
+                isAbnormal: emergency
             ))
         }
         return result
@@ -108,7 +108,7 @@ enum CSVService {
 
     private static func parseBool(_ value: String) -> Bool {
         switch value.trimmingCharacters(in: .whitespaces).lowercased() {
-        case "true", "yes", "y", "1", "x", "emergency": return true
+        case "true", "yes", "y", "1", "x", "abnormal": return true
         default: return false
         }
     }
@@ -134,7 +134,7 @@ enum CSVService {
                 callout: row.callout,
                 reference: row.reference,
                 body: row.body,
-                isEmergency: row.isEmergency
+                isAbnormal: row.isAbnormal
             ))
         }
 
@@ -152,7 +152,7 @@ enum CSVService {
                        callout: $0.callout,
                        reference: $0.reference,
                        body: $0.body,
-                       isEmergency: $0.isEmergency)
+                       isAbnormal: $0.isAbnormal)
         }
         store.appendItems(folderID: folderID, items: items)
     }

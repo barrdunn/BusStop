@@ -37,7 +37,7 @@ struct ItemListView: View {
                             Circle()
                                 .fill(Color.red)
                                 .frame(width: 8, height: 8)
-                                .opacity(item.isEmergency ? 1 : 0)
+                                .opacity(item.isAbnormal ? 1 : 0)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(item.title)
                                     .font(.headline)
