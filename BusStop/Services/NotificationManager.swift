@@ -288,7 +288,7 @@ final class NotificationManager: NSObject {
 
     private func scheduleNotification(item: MemoryItem, fireDate: Date, identifier: String) {
         let content = UNMutableNotificationContent()
-        content.title = "🚏 Bus Stop"
+        content.title = "BusStop"
         content.body = item.title
         content.sound = .default
         content.categoryIdentifier = Self.categoryID
