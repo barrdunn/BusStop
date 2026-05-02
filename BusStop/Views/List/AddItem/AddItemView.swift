@@ -19,6 +19,7 @@ struct AddItemView: View {
     @State private var callout: String
     @State private var reference: String
     @State private var procedure: String
+    @State private var isEmergency: Bool
 
     init(folderID: String, editingItem: MemoryItem? = nil) {
         self.folderID = folderID
@@ -27,6 +28,7 @@ struct AddItemView: View {
         _callout = State(initialValue: editingItem?.callout ?? "")
         _reference = State(initialValue: editingItem?.reference ?? "")
         _procedure = State(initialValue: editingItem?.body ?? "")
+        _isEmergency = State(initialValue: editingItem?.isEmergency ?? false)
     }
 
     private var isEditing: Bool { editingItem != nil }
@@ -44,6 +46,15 @@ struct AddItemView: View {
 
                 Section("Reference") {
                     TextField("e.g. Refer to Vol II - ABN - ...", text: $reference)
+                }
+
+                Section {
+                    Toggle(isOn: $isEmergency) {
+                        Label("Emergency Procedure", systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(isEmergency ? Color.red : Color.primary)
+                    }
+                } footer: {
+                    Text("Emergency items are marked with a red dot in the list and a red reference.")
                 }
 
                 Section("Procedure") {
@@ -72,13 +83,15 @@ struct AddItemView: View {
                              title: title,
                              callout: callout,
                              reference: reference,
-                             body: procedure)
+                             body: procedure,
+                             isEmergency: isEmergency)
         } else {
             store.addItem(folderID: folderID,
                           title: title,
                           callout: callout,
                           reference: reference,
-                          body: procedure)
+                          body: procedure,
+                          isEmergency: isEmergency)
         }
         dismiss()
     }

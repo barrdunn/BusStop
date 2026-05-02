@@ -106,7 +106,7 @@ struct SettingsView: View {
         } header: {
             Text("Data")
         } footer: {
-            Text("CSV columns: folder, title, callout, reference, body. Per-folder import is available from each folder.")
+            Text("CSV columns: folder, title, callout, reference, body, emergency (optional). Per-folder import is available from each folder.")
         }
     }
 

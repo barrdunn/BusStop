@@ -36,7 +36,8 @@ enum MemoryItemsData {
         • SPEED BRAKE LEVER — CHECK RETRACTED
         • BANK — WINGS LEVEL or ADJUST
         • DO NOT CHANGE CONFIGURATION (SLATS/FLAP, GEAR) UNTIL CLEAR OF OBSTACLE
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 2
@@ -56,7 +57,8 @@ enum MemoryItemsData {
 
         If still no braking:
         • PARK BRAKE — SHORT SUCCESSIVE APPLICATIONS
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 3
@@ -75,7 +77,8 @@ enum MemoryItemsData {
           • THR LEVERS — IDLE
 
         • SPD BRK — FULL
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 4
@@ -96,7 +99,8 @@ enum MemoryItemsData {
 
         If in clean configuration and below 20,000 feet:
         • FLAP 1 — SELECT
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 5
@@ -112,7 +116,8 @@ enum MemoryItemsData {
         At the same time:
         • PITCH ATTITUDE — 15°
         • BANK — WINGS LEVEL
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 6
@@ -135,7 +140,8 @@ enum MemoryItemsData {
           - Respond promptly and smoothly
         • VERTICAL SPEED — ADJUST OR MAINTAIN
           - Adjust or maintain the vertical speed as required to reach the green area and/or avoid the red area of the vertical speed scale
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 7
@@ -158,7 +164,8 @@ enum MemoryItemsData {
         • SPEEDBRAKES — CHECK RETRACTED
         • L/G — UP
         • When at or above MSA or Circuit Altitude: Level off for troubleshooting
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - 8
@@ -185,7 +192,8 @@ enum MemoryItemsData {
         • DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL OUT OF WINDSHEAR
         • CAREFULLY MONITOR FLIGHT PATH AND SPEED
         • WHEN OUT, SMOOTHLY RECOVER NORMAL CLIMB
-        """
+        """,
+        isEmergency: true
     )
 
     // MARK: - Extras
@@ -208,6 +216,7 @@ enum MemoryItemsData {
         • Rate of descent not to exceed 1,000 FPM
         • Within -5 to +15 knots of target speed for approach
         • Thrust stabilized, usually above idle, commensurate with what is required to maintain the target speed criteria
-        """
+        """,
+        isEmergency: false
     )
 }

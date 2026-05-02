@@ -10,7 +10,8 @@ import Foundation
 @MainActor
 enum CSVService {
 
-    static let header = ["folder", "title", "callout", "reference", "body"]
+    static let baseHeader = ["folder", "title", "callout", "reference", "body"]
+    static let exportHeader = baseHeader + ["emergency"]
 
     struct ParsedRow {
         let folder: String
@@ -18,6 +19,7 @@ enum CSVService {
         let callout: String
         let reference: String
         let body: String
+        let isEmergency: Bool
     }
 
     enum ImportError: Error, LocalizedError {
@@ -29,7 +31,7 @@ enum CSVService {
             switch self {
             case .empty: return "The CSV file was empty."
             case .malformed: return "The CSV could not be parsed."
-            case .missingHeader: return "The CSV header must include folder, title, callout, reference, body."
+            case .missingHeader: return "The CSV header must include folder, title, callout, reference, body (emergency optional)."
             }
         }
     }
@@ -37,10 +39,17 @@ enum CSVService {
     // MARK: - Export
 
     static func exportCSV(folders: [Folder]) -> String {
-        var lines: [String] = [header.map(escape).joined(separator: ",")]
+        var lines: [String] = [exportHeader.map(escape).joined(separator: ",")]
         for folder in folders {
             for item in folder.items {
-                let row = [folder.name, item.title, item.callout, item.reference, item.body]
+                let row = [
+                    folder.name,
+                    item.title,
+                    item.callout,
+                    item.reference,
+                    item.body,
+                    item.isEmergency ? "true" : "false",
+                ]
                 lines.append(row.map(escape).joined(separator: ","))
             }
         }
@@ -65,23 +74,43 @@ enum CSVService {
         guard let first = rows.first else { throw ImportError.empty }
 
         let normalizedHeader = first.map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
-        guard normalizedHeader == header else { throw ImportError.missingHeader }
+
+        // Accept either the legacy 5-column header or the 6-column header with emergency.
+        let hasEmergencyColumn: Bool
+        if normalizedHeader == baseHeader {
+            hasEmergencyColumn = false
+        } else if normalizedHeader == exportHeader {
+            hasEmergencyColumn = true
+        } else {
+            throw ImportError.missingHeader
+        }
+
+        let columnCount = hasEmergencyColumn ? exportHeader.count : baseHeader.count
 
         var result: [ParsedRow] = []
         for row in rows.dropFirst() {
             // Skip rows that are completely empty
             if row.allSatisfy({ $0.isEmpty }) { continue }
             // Pad missing trailing fields rather than rejecting
-            let padded = row + Array(repeating: "", count: max(0, header.count - row.count))
+            let padded = row + Array(repeating: "", count: max(0, columnCount - row.count))
+            let emergency = hasEmergencyColumn ? parseBool(padded[5]) : false
             result.append(ParsedRow(
                 folder: padded[0],
                 title: padded[1],
                 callout: padded[2],
                 reference: padded[3],
-                body: padded[4]
+                body: padded[4],
+                isEmergency: emergency
             ))
         }
         return result
+    }
+
+    private static func parseBool(_ value: String) -> Bool {
+        switch value.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "true", "yes", "y", "1", "x", "emergency": return true
+        default: return false
+        }
     }
 
     // MARK: - Import
@@ -104,7 +133,8 @@ enum CSVService {
                 title: row.title,
                 callout: row.callout,
                 reference: row.reference,
-                body: row.body
+                body: row.body,
+                isEmergency: row.isEmergency
             ))
         }
 
@@ -118,7 +148,11 @@ enum CSVService {
     static func importAppending(csv: String, folderID: String, into store: FolderStore) throws {
         let rows = try parseCSV(csv)
         let items = rows.map {
-            MemoryItem(title: $0.title, callout: $0.callout, reference: $0.reference, body: $0.body)
+            MemoryItem(title: $0.title,
+                       callout: $0.callout,
+                       reference: $0.reference,
+                       body: $0.body,
+                       isEmergency: $0.isEmergency)
         }
         store.appendItems(folderID: folderID, items: items)
     }

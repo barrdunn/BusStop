@@ -33,13 +33,19 @@ struct ItemListView: View {
             } else {
                 ForEach(liveFolder.items) { item in
                     NavigationLink(value: ItemsRoute.item(folderID: liveFolder.id, itemID: item.id)) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(item.title)
-                                .font(.headline)
-                            if !item.callout.isEmpty {
-                                Text("\"\(item.callout)\"")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                        HStack(spacing: 10) {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                                .opacity(item.isEmergency ? 1 : 0)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(item.title)
+                                    .font(.headline)
+                                if !item.callout.isEmpty {
+                                    Text("\"\(item.callout)\"")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .padding(.vertical, 4)

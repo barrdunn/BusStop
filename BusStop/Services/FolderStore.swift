@@ -75,9 +75,10 @@ final class FolderStore: ObservableObject {
                  title: String,
                  callout: String,
                  reference: String,
-                 body: String) -> MemoryItem? {
+                 body: String,
+                 isEmergency: Bool = false) -> MemoryItem? {
         guard let idx = folders.firstIndex(where: { $0.id == folderID }) else { return nil }
-        let item = MemoryItem(title: title, callout: callout, reference: reference, body: body)
+        let item = MemoryItem(title: title, callout: callout, reference: reference, body: body, isEmergency: isEmergency)
         folders[idx].items.append(item)
         save()
         return item
@@ -88,13 +89,15 @@ final class FolderStore: ObservableObject {
                     title: String,
                     callout: String,
                     reference: String,
-                    body: String) {
+                    body: String,
+                    isEmergency: Bool = false) {
         guard let fIdx = folders.firstIndex(where: { $0.id == folderID }),
               let iIdx = folders[fIdx].items.firstIndex(where: { $0.id == itemID }) else { return }
         folders[fIdx].items[iIdx].title = title
         folders[fIdx].items[iIdx].callout = callout
         folders[fIdx].items[iIdx].reference = reference
         folders[fIdx].items[iIdx].body = body
+        folders[fIdx].items[iIdx].isEmergency = isEmergency
         save()
     }
 
