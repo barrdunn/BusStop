@@ -213,19 +213,21 @@ struct StudyView: View {
     
     private var answerSide: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(currentItem.title)
-                    .font(.headline)
-                
-                Text(currentItem.body)
-                    .font(.body)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(currentItem.title)
+                        .font(.headline)
+
+                    Text(currentItem.body)
+                        .font(.body)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 12)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            
-            Spacer()
-            
+            .scrollIndicators(.visible)
+
             Text("Tap to flip · Swipe for next")
                 .font(.caption)
                 .foregroundStyle(.secondary)

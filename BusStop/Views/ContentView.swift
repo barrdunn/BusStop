@@ -10,26 +10,42 @@ import SwiftUI
 struct ContentView: View {
 
     @EnvironmentObject var router: Router
+    @State private var showingSettings = false
 
     var body: some View {
-        TabView(selection: $router.selectedTab) {
-            FolderListView()
-                .tabItem {
-                    Label("Items", systemImage: "list.bullet")
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Picker("", selection: $router.selectedTab) {
+                    Text("Items").tag(Router.Tab.list)
+                    Text("Study").tag(Router.Tab.study)
                 }
-                .tag(Router.Tab.list)
+                .pickerStyle(.segmented)
 
-            StudyView()
-                .tabItem {
-                    Label("Study", systemImage: "rectangle.on.rectangle.angled")
+                Button {
+                    showingSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.title3)
+                        .frame(width: 36, height: 32)
                 }
-                .tag(Router.Tab.study)
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.bar)
 
+            ZStack {
+                FolderListView()
+                    .opacity(router.selectedTab == .list ? 1 : 0)
+                    .allowsHitTesting(router.selectedTab == .list)
+
+                StudyView()
+                    .opacity(router.selectedTab == .study ? 1 : 0)
+                    .allowsHitTesting(router.selectedTab == .study)
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
             SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
-                .tag(Router.Tab.settings)
         }
     }
 }
