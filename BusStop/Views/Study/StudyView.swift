@@ -112,7 +112,7 @@ struct StudyView: View {
         .onAppear {
             if shuffled.isEmpty { reshuffle() }
         }
-        .onChange(of: folderStore.folders) { _, _ in reshuffle() }
+        .onChange(of: items.count) { _, _ in reshuffle() }
         .onChange(of: settings.disabledStudyFolderIDs) { _, _ in reshuffle() }
         .sheet(isPresented: $showingFolderPicker) {
             FolderSelectionView(
@@ -124,8 +124,18 @@ struct StudyView: View {
     }
     
     // MARK: - Card
-    
-    private var currentItem: MemoryItem { shuffled[currentIndex] }
+
+    private var currentItem: MemoryItem {
+        let snapshot = shuffled[currentIndex]
+        // Always read the latest version from the store so edits show up live.
+        return folderStore.allItems.first { $0.id == snapshot.id } ?? snapshot
+    }
+
+    private var currentFolderID: String? {
+        folderStore.folder(for: currentItem.id)?.id
+    }
+
+    @State private var showingEdit = false
     
     private var cardView: some View {
         GeometryReader { geo in
@@ -144,8 +154,8 @@ struct StudyView: View {
             .rotationEffect(.degrees(Double(dragOffset.width) / 20), anchor: .bottom)
             .frame(width: geo.size.width, height: geo.size.height)
             .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 10)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 20)
                     .onChanged { value in
                         if !isDragging {
                             if abs(value.translation.width) > abs(value.translation.height) {
@@ -213,6 +223,22 @@ struct StudyView: View {
     
     private var answerSide: some View {
         VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Spacer()
+                Button {
+                    showingEdit = true
+                } label: {
+                    Image(systemName: "pencil")
+                        .font(.subheadline)
+                        .padding(8)
+                        .background(Circle().fill(Color(.tertiarySystemBackground)))
+                }
+                .buttonStyle(.plain)
+                .disabled(currentFolderID == nil)
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 12)
+
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(currentItem.title)
@@ -223,7 +249,7 @@ struct StudyView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.top, 4)
                 .padding(.bottom, 12)
             }
             .scrollIndicators(.visible)
@@ -239,6 +265,11 @@ struct StudyView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemBackground))
                 .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+        }
+        .sheet(isPresented: $showingEdit) {
+            if let folderID = currentFolderID {
+                AddItemView(folderID: folderID, editingItem: currentItem)
+            }
         }
     }
     

@@ -217,6 +217,6 @@ enum MemoryItemsData {
         • Within -5 to +15 knots of target speed for approach
         • Thrust stabilized, usually above idle, commensurate with what is required to maintain the target speed criteria
         """,
-        isAbnormal: false
+        isAbnormal: true
     )
 }
