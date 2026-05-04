@@ -40,8 +40,10 @@ final class NotificationManager: NSObject {
 
     func requestPermission(completion: (() -> Void)? = nil) {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            #if DEBUG
             if let error { print("[BusStop] Notification auth error: \(error)") }
             print("[BusStop] Notifications authorized: \(granted)")
+            #endif
             DispatchQueue.main.async {
                 completion?()
             }
@@ -58,9 +60,13 @@ final class NotificationManager: NSObject {
 
         do {
             try BGTaskScheduler.shared.submit(request)
+            #if DEBUG
             print("[BusStop] BG refresh scheduled in ~\(Int(halfwaySeconds))s")
+            #endif
         } catch {
+            #if DEBUG
             print("[BusStop] BG refresh schedule failed: \(error)")
+            #endif
         }
     }
 
@@ -147,7 +153,9 @@ final class NotificationManager: NSObject {
 
             guard notifSettings.authorizationStatus == .authorized ||
                   notifSettings.authorizationStatus == .provisional else {
+                #if DEBUG
                 print("[BusStop] Not authorized, skipping schedule")
+                #endif
                 return
             }
 
@@ -161,7 +169,9 @@ final class NotificationManager: NSObject {
         center.removeAllPendingNotificationRequests()
 
         guard settings.notificationsEnabled else {
+            #if DEBUG
             print("[BusStop] Notifications disabled in settings")
+            #endif
             return
         }
 
@@ -169,7 +179,9 @@ final class NotificationManager: NSObject {
         let endHour = settings.activeEndHour
 
         guard endHour > startHour, !items.isEmpty else {
+            #if DEBUG
             print("[BusStop] Invalid hours or no items")
+            #endif
             return
         }
 
@@ -200,13 +212,19 @@ final class NotificationManager: NSObject {
         for (index, entry) in toSchedule.enumerated() {
             scheduleNotification(item: entry.item, fireDate: entry.date, identifier: "bs-\(index)")
         }
-
+        
+        #if DEBUG
         print("[BusStop] Scheduled \(toSchedule.count) notifications")
+        #endif
         if let first = toSchedule.first {
+            #if DEBUG
             print("[BusStop] Next in \(Int(first.date.timeIntervalSinceNow))s")
+            #endif
         }
         if let last = toSchedule.last {
+            #if DEBUG
             print("[BusStop] Last in \(Int(last.date.timeIntervalSinceNow / 3600))h")
+            #endif
         }
     }
 
@@ -231,14 +249,18 @@ final class NotificationManager: NSObject {
         guard let item = items.randomElement() else { return }
         scheduleNotification(item: item, fireDate: Date().addingTimeInterval(1),
                              identifier: "bs-dev-now-\(UUID().uuidString)")
+        #if DEBUG
         print("[BusStop] Dev: sending \(item.title) in 1s")
+        #endif
     }
 
     func devSendAfter(seconds: TimeInterval) {
         guard let item = items.randomElement() else { return }
         let fireDate = Date().addingTimeInterval(seconds)
         scheduleNotification(item: item, fireDate: fireDate, identifier: "bs-dev-\(UUID().uuidString)")
+        #if DEBUG
         print("[BusStop] Dev: scheduled \(item.title) in \(seconds)s")
+        #endif
     }
 
     func devSendBatch(count: Int, withinSeconds totalSeconds: TimeInterval) {
@@ -247,7 +269,9 @@ final class NotificationManager: NSObject {
             guard let item = items.randomElement() else { return }
             let fireDate = Date().addingTimeInterval(delay)
             scheduleNotification(item: item, fireDate: fireDate, identifier: "bs-dev-batch-\(i)-\(UUID().uuidString)")
+            #if DEBUG
             print("[BusStop] Dev batch: \(item.title) in \(Int(delay))s")
+            #endif
         }
     }
 
@@ -301,7 +325,9 @@ final class NotificationManager: NSObject {
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
         center.add(request) { error in
+            #if DEBUG
             if let error { print("[BusStop] Schedule error: \(error)") }
+            #endif
         }
     }
 }
