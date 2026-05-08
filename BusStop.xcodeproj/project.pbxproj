@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2A5790592F6F132000A771FB /* busstop1.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2A5790582F6F132000A771FB /* busstop1.icon */; };
-		2A7020702FA857CE00921291 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2A70206F2FA857BF00921291 /* PrivacyInfo.xcprivacy */; };
+		2A70207B2FAD95BB00921291 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2A70207A2FAD95BB00921291 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +30,7 @@
 
 /* Begin PBXFileReference section */
 		2A5790582F6F132000A771FB /* busstop1.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = busstop1.icon; sourceTree = "<group>"; };
-		2A70206F2FA857BF00921291 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		2A70207A2FAD95BB00921291 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2AD4D13E2F6E493E00304964 /* BusStop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BusStop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AD4D14B2F6E493F00304964 /* BusStopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BusStopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AD4D1552F6E493F00304964 /* BusStopUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BusStopUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,7 +95,7 @@
 		2AD4D1352F6E493E00304964 = {
 			isa = PBXGroup;
 			children = (
-				2A70206F2FA857BF00921291 /* PrivacyInfo.xcprivacy */,
+				2A70207A2FAD95BB00921291 /* PrivacyInfo.xcprivacy */,
 				2AD4D1402F6E493E00304964 /* BusStop */,
 				2AD4D14E2F6E493F00304964 /* BusStopTests */,
 				2AD4D1582F6E493F00304964 /* BusStopUITests */,
@@ -234,7 +234,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A7020702FA857CE00921291 /* PrivacyInfo.xcprivacy in Resources */,
+				2A70207B2FAD95BB00921291 /* PrivacyInfo.xcprivacy in Resources */,
 				2A5790592F6F132000A771FB /* busstop1.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
